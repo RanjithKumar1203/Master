@@ -27,7 +27,7 @@ jobs:
       run: |
         
     - name: Build, Tag, and Push the Image to Amazon ECR
-      id: build-image
+      id: docker build -t demo .
       env:
         ECR_REGISTRY: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 932523547224.dkr.ecr.us-east-1.amazonaws.com
         ECR_REPOSITORY: demo
