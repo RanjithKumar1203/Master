@@ -33,7 +33,7 @@ jobs:
         id: docker-build
         env:
           ECR_REGISTRY: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 932523547224.dkr.ecr.us-east-1.amazonaws.com
-          ECR_REPOSITORY: demo
+          ECR_REPOSITORY: cloudevopsguru/demo1
           # Use the git tag as the image tag.
           # github.ref format is like `refs/tags/v0.0.1`, so we strip the the
           # `refs/tags/` prefix and export this for later use.
