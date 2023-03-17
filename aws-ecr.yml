@@ -9,7 +9,7 @@ name: mdh-app
 jobs:
   deploy:
     name: Deploy
-    runs-on: ubuntu-latest
+    runs-on: sefl-hosted
 
     steps:
     - name: Checkout
