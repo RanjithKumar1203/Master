@@ -18,20 +18,12 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+    - name: Login to AWS ECR
+      run: | 
 
-    - name: Automatic Tagging of Releases
-      id: increment-git-tag
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 932523547224.dkr.ecr.us-east-1.amazonaws.com
+    - name: Build and push Docker image to ECR
       run: |
-        
-    - name: Build, Tag, and Push the Image to Amazon ECR
-      id: docker build -t demo .
-      env:
-        ECR_REGISTRY: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 932523547224.dkr.ecr.us-east-1.amazonaws.com
-        ECR_REPOSITORY: demo
-        IMAGE_TAG: latest
-      run: |
-        docker tag demo:latest 932523547224.dkr.ecr.us-east-1.amazonaws.com/demo:latest .
-        docker push 932523547224.dkr.ecr.us-east-1.amazonaws.com/demo:latest
+          docker build -t demo .
+          docker tag demo:latest 932523547224.dkr.ecr.us-east-1.amazonaws.com/demo:latest
+          docker push 932523547224.dkr.ecr.us-east-1.amazonaws.com/demo:latest
