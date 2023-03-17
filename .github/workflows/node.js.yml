@@ -1,32 +1,43 @@
-name: Build and push Docker images to ECR
+name: Build and push image to ECR
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
+      - "releases/**"
 
 jobs:
-  build-and-push:
-    runs-on: self-hosted
+  build:
+    name: Build Image
+    runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Check out code
+        uses: actions/checkout@v2
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-region: us-east-1
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        push: true
-        tags: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 932523547224.dkr.ecr.us-east-1.amazonaws.com:latest
+      - id: docker-tag
+        uses: yuya-takeyama/docker-tag-from-github-ref-action@v1
+
+      - name: Build & Push Docker image
+        id: docker-build
+        env:
+          ECR_REGISTRY: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 932523547224.dkr.ecr.us-east-1.amazonaws.com
+          ECR_REPOSITORY: cloudevopsguru/demo1
+          # Use the git tag as the image tag.
+          # github.ref format is like `refs/tags/v0.0.1`, so we strip the the
+          # `refs/tags/` prefix and export this for later use.
+          IMAGE_TAG: ${{ steps.docker-tag.outputs.tag }}
+        run: |
+          docker tag demo:latest 932523547224.dkr.ecr.us-east-1.amazonaws.com/demo:latest .
+          docker push 932523547224.dkr.ecr.us-east-1.amazonaws.com/demo:latest
