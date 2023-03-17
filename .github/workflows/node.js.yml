@@ -33,11 +33,11 @@ jobs:
         id: docker-build
         env:
           ECR_REGISTRY: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 932523547224.dkr.ecr.us-east-1.amazonaws.com
-          ECR_REPOSITORY: cloudevopsguru/demo1
+          ECR_REPOSITORY: demo
           # Use the git tag as the image tag.
           # github.ref format is like `refs/tags/v0.0.1`, so we strip the the
           # `refs/tags/` prefix and export this for later use.
-          IMAGE_TAG: ${{ steps.docker-tag.outputs.tag }}
+          IMAGE_TAG: latest
         run: |
           docker tag demo:latest 932523547224.dkr.ecr.us-east-1.amazonaws.com/demo:latest .
           docker push 932523547224.dkr.ecr.us-east-1.amazonaws.com/demo:latest
