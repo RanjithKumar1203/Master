@@ -1,11 +1,4 @@
-FROM node:14
-
-WORKDIR /usr/src/app
-
-COPY package.json .
-RUN npm install 
-COPY . .
-
-EXPOSE 3000
-
-CMD ["node", "index.js"]
+FROM php:7.2-apache
+COPY ./web/ /var/www/html/
+EXPOSE 80
+CMD ["apachectl", "-D", "FOREGROUND"]
