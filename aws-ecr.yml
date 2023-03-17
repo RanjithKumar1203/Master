@@ -1,32 +1,32 @@
-name: Run commands on different operating systems
+name: Build and push Docker images to ECR
+
 on:
   push:
     branches: [ main ]
-  pull_request:
-    branches: [ main ]
 
 jobs:
-  Run-npm-on-Ubuntu:
-    name: Run npm on Ubuntu
+  build-and-push:
     runs-on: self-hosted
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '14'
-      - run: npm help
 
-  Run-PSScriptAnalyzer-on-Windows:
-    name: Run PSScriptAnalyzer on Windows
-    runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Install PSScriptAnalyzer module
-        shell: pwsh
-        run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module PSScriptAnalyzer -ErrorAction Stop
-      - name: Get list of rules
-        shell: pwsh
-        run: |
-          Get-ScriptAnalyzerRule
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-region: us-east-1
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 932523547224.dkr.ecr.us-east-1.amazonaws.com:latest
